@@ -167,3 +167,10 @@ npm run table && node tools/report.mts
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+<!-- sen-publish:links -->
+## Links
+
+- 🌐 Demo: https://sen.ltd/portfolio/cram/
+- 📝 記事: https://qiita.com/sen-ltd/items/5f4f7de159bc90502c73
+<!-- /sen-publish:links -->
