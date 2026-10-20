@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cram — dominoes either way, a perfect player, and every region's nimber</title>
+    <meta
+      name="description"
+      content="Cram in the browser: both players place dominoes horizontally or vertically, and whoever cannot move loses. A perfect player splits the board into independent regions, labels each with its nimber, and marks every move that brings the XOR to *0. The nimbers of empty boards are recomputed three ways and checked against Lemoine and Viennot's 2010 tables."
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23151412'/%3E%3Crect x='5' y='5' width='9' height='22' rx='2.5' fill='%23b9a6f0'/%3E%3Crect x='17' y='5' width='10' height='9' rx='2.5' fill='%23e8a15a'/%3E%3Crect x='17' y='18' width='10' height='9' rx='2.5' fill='%23b9a6f0'/%3E%3C/svg%3E"
+    />
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Cram <span>impartial Domineering</span></h1>
+        <p class="sub">
+          Take turns placing dominoes on the grid, <strong>horizontally or vertically</strong> — both players may
+          use either direction. Whoever cannot place a domino on their turn <strong>loses</strong>. As the dominoes
+          wall off parts of the board, the game splits into independent regions; each one is labelled with its
+          <strong>nimber</strong>, and the whole position is worth their XOR. With hints on, every move you could
+          make carries a dot: <strong class="win-t">green</strong> brings the XOR to *0 and keeps a won game won,
+          <strong class="lose-t">red</strong> does not.
+        </p>
+      </header>
+
+      <div id="wrap">
+        <div class="stage">
+          <div class="controls">
+            <label class="sel">rows <select id="rowsSel"></select></label>
+            <label class="sel">cols <select id="colsSel"></select></label>
+            <label class="sel">first move
+              <select id="firstSel">
+                <option value="you">you</option>
+                <option value="cpu">computer</option>
+              </select>
+            </label>
+            <label class="sel chk"><input type="checkbox" id="hints" checked /> hints</label>
+            <button id="undo">Undo</button>
+            <button id="newgame" class="primary">New game</button>
+          </div>
+          <div id="boardwrap"><svg id="board" role="img" aria-label="Cram board"></svg></div>
+          <div id="status" aria-live="polite"></div>
+        </div>
+        <div class="side">
+          <h3>this position</h3>
+          <div class="panel" id="position"></div>
+          <h3>nimber of the empty m × n board</h3>
+          <div class="panel" id="chart"></div>
+        </div>
+      </div>
+
+      <section class="notes">
+        <h2>How the perfect player works</h2>
+        <p>
+          Cram is <em>impartial</em>: both players have the same moves, so by the Sprague–Grundy theorem every
+          position behaves exactly like a single Nim heap of some size, its <strong>nimber</strong>. A region's
+          nimber is the smallest number that is not the value of any of its options (the <em>mex</em>), and a
+          position made of several regions that no domino can bridge is worth the XOR of their nimbers. The player to
+          move wins exactly when that XOR is not *0, and a winning move is one that brings it to *0.
+        </p>
+        <p>
+          The solver keys its table by the region's <em>shape</em>, cut down to its bounding box and reduced over
+          the eight symmetries of the square, so an L of five cells in one corner is the same entry as a mirrored L
+          anywhere on any board. Cells that have lost all their free neighbours are dropped on the spot: nobody can
+          ever cover them. The table lives in a Web Worker for the whole visit, so once the empty board has been
+          solved, the positions later in the game are mostly lookups.
+        </p>
+        <h2>The chart</h2>
+        <p>
+          Every value was recomputed under Node, three ways: a full mex over every option of every shape; a
+          win/loss search that does not use nimbers at all and remembers whole sums of regions; and the method of
+          Lemoine and Viennot's <em>Nimbers are inevitable</em> (2010), which never runs a full mex but asks "does
+          the player to move lose this region plus a Nim heap of <em>n</em>?" and stops at the first winning reply.
+          The values are checked against the tables in that paper.
+        </p>
+      </section>
+
+      <footer>
+        <p>
+          Built by <a href="https://sen.ltd/">SEN LLC</a>. TypeScript, no runtime
+          dependencies. <a href="https://github.com/sen-ltd/cram">Source</a>.
+        </p>
+      </footer>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
